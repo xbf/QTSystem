@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 100000 - 100999 港澳资讯数据库查询号段 -->
+
+<mapper namespace="com.xubf.qt.quotation.inter.gazx.SecuQuotationMapper">
+
+	<!-- 查询每个月有指标信息的第一个交易日日期 -->
+	<select id="selectQuot" parameterType="String" resultType="hashmap">
+		select init_date from qt_system.secuquotation where position_str = #{position_str}
+	</select>
+	
+</mapper>

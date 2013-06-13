@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 100000 - 100999 港澳资讯数据库查询号段 -->
+
+<mapper namespace="com.xubf.qt.quotation.inter.gazx.GangAoMapper">
+	<!-- 查询股票基本信息-->
+	<select id="100001" resultType="com.xubf.qt.quotation.inter.gazx.VO100001">
+		select * from center_admin.STK_BASICINFO where SecuCategoryCodeII = 1001 and ExchangeCode in (101,105) and listingdate is not null and DelistingDate is null
+	</select>
+	
+	<!-- 查询每个月有指标信息的第一个交易日日期 -->
+	<select id="100002" parameterType="com.xubf.qt.quotation.inter.gazx.VO100002" resultType="hashmap">
+		select min(tradingday) as tradingDay from center_admin.stk_dailyquoteindex where tradingday between to_date(#{beginDate},'YYYYMMDD') and to_date(#{endDate},'YYYYMMDD')
+	</select>
+	
+	<!-- 查询指定交易日的证券指标信息，如：市盈率，市净率等 -->
+	<select id="100003" parameterType="String" resultType="com.xubf.qt.quotation.inter.gazx.VO100003">
+		select a.*, b.tradingcode from center_admin.stk_dailyquoteindex a, center_admin.stk_basicinfo b where a.tradingday = to_date(#{tradingDay},'YYYYMMDD') and a.secucode = b.secucode
+	</select>
+	
+	<!-- 查询港澳资讯公司单季主要会计数据表中某个公司的信息 -->
+	<select id="100004" parameterType="hashmap" resultType="hashmap">
+		select * from center_admin.com_qmainfinadatanas where comcode = #{comCode} order by enddate
+	</select>
+	
+	<select id ="100005" parameterType="hashmap" resultType="hashmap">
+		select * from center_admin.com_qmainfinadatanas where comcode = #{comcode} and enddate <= to_date(#{calcu_date},'YYYYMMDD') order by enddate
+	</select>
+	
+	
+	
+	
+</mapper>

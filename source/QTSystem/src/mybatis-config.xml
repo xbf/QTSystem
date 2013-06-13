@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<!-- MySql Connection -->
+<!-- <configuration> <properties> <property name="driver" value="com.mysql.jdbc.Driver"/> 
+	<property name="url" value="jdbc:mysql://localhost:3306/qt_system"/> <property 
+	name="username" value="root"/> <property name="password" value="deviation8i2w5t"/> 
+	</properties> <environments default="development"> <environment id="development"> 
+	<transactionManager type="JDBC" /> <dataSource type="POOLED"> <property name="driver" 
+	value="${driver}" /> <property name="url" value="${url}" /> <property name="username" 
+	value="${username}" /> <property name="password" value="${password}" /> </dataSource> 
+	</environment> </environments> <mappers> <mapper resource="com/xubf/qt/quotation/inter/SecuQuotationMapper.xml" 
+	/> </mappers> </configuration> -->
+
+<!-- Oracle Connection -->
+<configuration>
+	<environments default="gazx_conf">
+		<environment id="gazx_conf">
+			<transactionManager type="JDBC" />
+			<dataSource type="POOLED">
+				<property name="driver" value="oracle.jdbc.driver.OracleDriver" />
+				<property name="url"
+					value="jdbc:oracle:thin:@172.18.18.67:1521:centerdb" />
+				<property name="username" value="center_admin" />
+				<property name="password" value="center_admin" />
+			</dataSource>
+		</environment>
+
+		<environment id="qtsystem_conf">
+			<transactionManager type="JDBC" />
+			<dataSource type="POOLED">
+				<property name="driver" value="com.mysql.jdbc.Driver" />
+				<property name="url"
+					value="jdbc:mysql://127.0.0.1:3306/qt_system" />
+				<property name="username" value="root" />
+				<property name="password" value="deviation" />
+			</dataSource>
+		</environment>
+	</environments>
+	<mappers>
+		<mapper resource="com/xubf/qt/quotation/inter/gazx/GangAoMapper.xml"/>
+		<mapper resource="com/xubf/qt/quotation/inter/gazx/SecuQuotationMapper.xml"/>
+		
+	</mappers>
+</configuration>
