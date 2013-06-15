@@ -19,30 +19,30 @@ public interface StockInfoLoader {
 	 * 导入某一交易日每只证券的市净率信息
 	 * @param stockInfoMap
 	 */
-	public void loadPB( HashMap<String, StockInfo> stockInfoMap, int date );
+	public void loadPB( HashMap<String, StockInfo> stockInfoMap, String date );
 	
 	/**
 	 * 导入某一交易日每只证券的市盈率信息
 	 * @param stockInfoMap
 	 */
-	public void loadPE( HashMap<String, StockInfo> stockInfoMap, int date );
+	public void loadPE( HashMap<String, StockInfo> stockInfoMap, String date );
 
 	/**
 	 * 导入某一交易日每只证券的市现率信息
 	 * @param stockInfoMap
 	 */
-	public void loadPC( HashMap<String, StockInfo> stockInfoMap, int date );
+	public void loadPC( HashMap<String, StockInfo> stockInfoMap, String date );
 	
 	/**
 	 * 导入某一交易日每只证券的市收率信息
 	 * @param stockInfoMap
 	 */
-	public void loadPS( HashMap<String, StockInfo> stockInfoMap, int date );	
+	public void loadPS( HashMap<String, StockInfo> stockInfoMap, String date );	
 	
 	/**
 	 * 计算每个月的ROA变动，本月没有财务指标的用最近一个月的财务指标为准。
 	 * @param stockInfoMap
 	 * @param date
 	 */
-	public void loadROAVar( HashMap<String, StockInfo> stockInfoMap, int date );
+	public void loadROAVar( HashMap<String, StockInfo> stockInfoMap, String date );
 }

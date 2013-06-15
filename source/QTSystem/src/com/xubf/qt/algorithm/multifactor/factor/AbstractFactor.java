@@ -22,6 +22,8 @@ public abstract class AbstractFactor {
 	 */
 	private double value;
 	
+	private int dataDate;
+	
 	/**
 	 * 排好序的证券信息类
 	 */
@@ -60,6 +62,14 @@ public abstract class AbstractFactor {
 	}
 
 	
+	public int getDataDate() {
+		return dataDate;
+	}
+
+	public void setDataDate(int dataDate) {
+		this.dataDate = dataDate;
+	}
+
 	public abstract void sort();
 	
 	

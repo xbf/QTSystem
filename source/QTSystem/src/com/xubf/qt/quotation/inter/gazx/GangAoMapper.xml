@@ -6,7 +6,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 <mapper namespace="com.xubf.qt.quotation.inter.gazx.GangAoMapper">
 	<!-- 查询股票基本信息-->
-	<select id="100001" resultType="com.xubf.qt.quotation.inter.gazx.VO100001">
+	<!-- com.xubf.qt.quotation.inter.gazx.VO100001 -->
+	<select id="100001" resultType="hashmap">
 		select * from center_admin.STK_BASICINFO where SecuCategoryCodeII = 1001 and ExchangeCode in (101,105) and listingdate is not null and DelistingDate is null
 	</select>
 	
@@ -16,8 +17,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 	
 	<!-- 查询指定交易日的证券指标信息，如：市盈率，市净率等 -->
-	<select id="100003" parameterType="String" resultType="com.xubf.qt.quotation.inter.gazx.VO100003">
-		select a.*, b.tradingcode from center_admin.stk_dailyquoteindex a, center_admin.stk_basicinfo b where a.tradingday = to_date(#{tradingDay},'YYYYMMDD') and a.secucode = b.secucode
+	<!-- resultType = com.xubf.qt.quotation.inter.gazx.VO100003 -->
+	<select id="100003" parameterType="hashmap" resultType="hashmap">
+		select a.*, b.tradingcode from center_admin.stk_dailyquoteindex a, center_admin.stk_basicinfo b where a.tradingday = to_date(#{trading_date},'YYYYMMDD') and a.secucode = b.secucode
 	</select>
 	
 	<!-- 查询港澳资讯公司单季主要会计数据表中某个公司的信息 -->

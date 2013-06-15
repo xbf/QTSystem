@@ -34,7 +34,7 @@ public class GAStockInfoLoader implements StockInfoLoader {
 		GAStockInfoLoader loader = new GAStockInfoLoader();
 		HashMap<String, StockInfo> stockInfoMap = new HashMap<String, StockInfo>();
 		loader.loadBasicInfo(stockInfoMap);
-		int date = 201301;
+		String date = "20130101";
 		loader.loadPB(stockInfoMap, date);
 		loader.loadPE(stockInfoMap, date);
 		loader.loadPC(stockInfoMap, date);
@@ -60,7 +60,7 @@ public class GAStockInfoLoader implements StockInfoLoader {
 		ArrayList<StockInfo> psList = new ArrayList<StockInfo>(stkCol); // 按PS排序的集合
 //		Collections.sort(psList, PriceSalseRatio.getInstance());
 		PriceSalseRatio.getInstance().setStkInfoArray(psList);
-		PriceCashFlowRatio.getInstance().sort();
+		PriceSalseRatio.getInstance().sort();
 		
 		
 		
@@ -135,41 +135,41 @@ public class GAStockInfoLoader implements StockInfoLoader {
 		SqlSessionFactory sessionFactory = ConnUtil.getInstance(ConnUtil.GAZX_CONF);
 		SqlSession session = sessionFactory.openSession();
 		try {
-			List<VO100001> stkBasicInfoList = session
+			List<HashMap<String, Object>> resultList = session
 					.selectList("com.xubf.qt.quotation.inter.gazx.GangAoMapper.100001");
-			Iterator<VO100001> stkInfoIter = stkBasicInfoList.iterator();
-			while (stkInfoIter.hasNext()) {
-				VO100001 vo100001 = stkInfoIter.next();
+			Iterator<HashMap<String, Object>> resultIter = resultList.iterator();
+			while (resultIter.hasNext()) {
+				HashMap<String, Object> result = resultIter.next();
 
-				if (!stockInfoMap.containsKey(vo100001.getTradingCode())) {
+				if (!stockInfoMap.containsKey(result.get("tradingcode"))) {
 					StockInfo stockInfo = new StockInfo();
-					stockInfo.setStockCode(vo100001.getTradingCode());
-					stockInfo.setComCode(vo100001.getComCode());
-					stockInfo.setInterCode(Integer.toString(vo100001.getSecuCode()));
-					if (vo100001.getExchangeCode() == 101) {
+					stockInfo.setStockCode((String)result.get("tradingcode"));
+					stockInfo.setComCode((Integer)result.get("comcode"));
+					stockInfo.setInterCode(Integer.toString((Integer)result.get("secucode")));
+					if ((Integer)result.get("exchangecode") == 101) {
 						stockInfo.setExchangeType('1');
-					} else if (vo100001.getExchangeCode() == 105) {
+					} else if ((Integer)result.get("exchangecode") == 105) {
 						stockInfo.setExchangeType('2');
 					} else {
 						;
 					}
-					stockInfo.setStockName(vo100001.getSecuAbbr());
+					stockInfo.setStockName((String)result.get("secuabbr"));
 
-					stockInfoMap.put(vo100001.getTradingCode(), stockInfo);
+					stockInfoMap.put((String)result.get("tradingcode"), stockInfo);
 
 				} else {
-					StockInfo stockInfo = stockInfoMap.get(vo100001.getTradingCode());
-					stockInfo.setStockCode(vo100001.getTradingCode());
-					stockInfo.setComCode(vo100001.getComCode());
-					stockInfo.setInterCode(Integer.toString(vo100001.getSecuCode()));
-					if (vo100001.getExchangeCode() == 101) {
+					StockInfo stockInfo = stockInfoMap.get(result.get("tradingcode"));
+					stockInfo.setStockCode((String)result.get("tradingcode"));
+					stockInfo.setComCode((Integer)result.get("comcode"));
+					stockInfo.setInterCode(Integer.toString((Integer)result.get("secucode")));
+					if ((Integer)result.get("exchangecode") == 101) {
 						stockInfo.setExchangeType('1');
-					} else if (vo100001.getExchangeCode() == 105) {
+					} else if ((Integer)result.get("exchangecode") == 105) {
 						stockInfo.setExchangeType('2');
 					} else {
 						;
 					}
-					stockInfo.setStockName(vo100001.getSecuAbbr());
+					stockInfo.setStockName((String)result.get("secuabbr"));
 				}
 			}
 		} finally {
@@ -178,37 +178,42 @@ public class GAStockInfoLoader implements StockInfoLoader {
 	}
 
 	@Override
-	public void loadPB(HashMap<String, StockInfo> stockInfoMap, int date) {
+	public void loadPB(HashMap<String, StockInfo> stockInfoMap, String date) {
 		// TODO Auto-generated method stub
 		SqlSessionFactory sessionFactory = ConnUtil.getInstance(ConnUtil.GAZX_CONF);
 		SqlSession session = sessionFactory.openSession();
 		try {
-			VO100002 vo100002 = new VO100002();
+//			VO100002 vo100002 = new VO100002();
+//
+//			vo100002.setBeginDate(Integer.toString(date) + "01");
+//			vo100002.setEndDate(Integer.toString(date) + "31");
+//		
+//			HashMap<String, Object> resultSet = session.selectOne(
+//					"com.xubf.qt.quotation.inter.gazx.GangAoMapper.100002", vo100002);
+//
+//			SimpleDateFormat format = new SimpleDateFormat("yyyyMMDD");
+//
+//			String tradingDay = format.format((Date) resultSet.get("TRADINGDAY"));
 
-			vo100002.setBeginDate(Integer.toString(date) + "01");
-			vo100002.setEndDate(Integer.toString(date) + "31");
-			HashMap<String, Object> resultSet = session.selectOne(
-					"com.xubf.qt.quotation.inter.gazx.GangAoMapper.100002", vo100002);
-
-			SimpleDateFormat format = new SimpleDateFormat("yyyyMMDD");
-
-			String tradingDay = format.format((Date) resultSet.get("TRADINGDAY"));
-
-			List<VO100003> vo100003List = session.selectList("com.xubf.qt.quotation.inter.gazx.GangAoMapper.100003",
-					tradingDay);
-			Iterator<VO100003> vo100003Iter = vo100003List.iterator();
-			while (vo100003Iter.hasNext()) {
-				VO100003 vo100003 = vo100003Iter.next();
-				if (stockInfoMap.containsKey(vo100003.getTradingCode())) {
-					StockInfo stockInfo = stockInfoMap.get(vo100003.getTradingCode());
+			HashMap<String, String> inParam = new HashMap<String, String>();
+			
+			inParam.put("trading_date", date);
+			
+			List<HashMap<String, Object>> resultList = session.selectList("com.xubf.qt.quotation.inter.gazx.GangAoMapper.100003",
+					inParam);
+			Iterator<HashMap<String, Object>> resultIter = resultList.iterator();
+			while (resultIter.hasNext()) {
+				HashMap<String, Object> result = resultIter.next();
+				if (stockInfoMap.containsKey(result.get("tradingcode"))) {
+					StockInfo stockInfo = stockInfoMap.get(result.get("tradingcode"));
 					HashMap<String, AbstractFactor> factorMap = stockInfo.getFactorMap();
 					if (factorMap.containsKey(PriceBookRatio.FACTOR_NAME)) {
 						PriceBookRatio pbRatio = (PriceBookRatio)factorMap.get(PriceBookRatio.FACTOR_NAME);
-						pbRatio.setValue(vo100003.getPb());
+						pbRatio.setValue((Double)result.get("pb"));
 						
 					} else {
 						PriceBookRatio pbRatio = new PriceBookRatio();
-						pbRatio.setValue(vo100003.getPb());
+						pbRatio.setValue((Double)result.get("pb"));
 						factorMap.put(PriceBookRatio.FACTOR_NAME, pbRatio);	
 					}
 				}
@@ -220,38 +225,42 @@ public class GAStockInfoLoader implements StockInfoLoader {
 	}
 
 	@Override
-	public void loadPE(HashMap<String, StockInfo> stockInfoMap, int date) {
+	public void loadPE(HashMap<String, StockInfo> stockInfoMap, String date) {
 		// TODO Auto-generated method stub
 		SqlSessionFactory sessionFactory = ConnUtil.getInstance(ConnUtil.GAZX_CONF);
 		SqlSession session = sessionFactory.openSession();
 		try {
-			VO100002 vo100002 = new VO100002();
+//			VO100002 vo100002 = new VO100002();
+//
+//			vo100002.setBeginDate(Integer.toString(date) + "01");
+//			vo100002.setEndDate(Integer.toString(date) + "31");
+//			HashMap<String, Object> resultSet = session.selectOne(
+//					"com.xubf.qt.quotation.inter.gazx.GangAoMapper.100002", vo100002);
+//
+//			SimpleDateFormat format = new SimpleDateFormat("yyyyMMDD");
+//
+//			String tradingDay = format.format((Date) resultSet.get("TRADINGDAY"));
+			
+			HashMap<String, String> inParam = new HashMap<String, String>();
+			
+			inParam.put("trading_date", date);
 
-			vo100002.setBeginDate(Integer.toString(date) + "01");
-			vo100002.setEndDate(Integer.toString(date) + "31");
-			HashMap<String, Object> resultSet = session.selectOne(
-					"com.xubf.qt.quotation.inter.gazx.GangAoMapper.100002", vo100002);
-
-			SimpleDateFormat format = new SimpleDateFormat("yyyyMMDD");
-
-			String tradingDay = format.format((Date) resultSet.get("TRADINGDAY"));
-
-			List<VO100003> vo100003List = session.selectList("com.xubf.qt.quotation.inter.gazx.GangAoMapper.100003",
-					tradingDay);
-			Iterator<VO100003> vo100003Iter = vo100003List.iterator();
-			while (vo100003Iter.hasNext()) {
-				VO100003 vo100003 = vo100003Iter.next();
-				if (stockInfoMap.containsKey(vo100003.getTradingCode())) {
-					StockInfo stockInfo = stockInfoMap.get(vo100003.getTradingCode());
+			List<HashMap<String, Object>> resultList = session.selectList("com.xubf.qt.quotation.inter.gazx.GangAoMapper.100003",
+					inParam);
+			Iterator<HashMap<String, Object>> resultIter = resultList.iterator();
+			while (resultIter.hasNext()) {
+				HashMap<String, Object> result = resultIter.next();
+				if (stockInfoMap.containsKey(result.get("tradingcode"))) {
+					StockInfo stockInfo = stockInfoMap.get(result.get("tradingcode"));
 					HashMap<String, AbstractFactor> factorMap = stockInfo.getFactorMap();
 					
 					if (factorMap.containsKey(PriceEarningRatio.FACTOR_NAME)) {
 						PriceEarningRatio peRatio = (PriceEarningRatio)factorMap.get(PriceEarningRatio.FACTOR_NAME);
-						peRatio.setValue(vo100003.getPe());
+						peRatio.setValue((Double)result.get("pe"));
 						
 					} else {
 						PriceEarningRatio peRatio = new PriceEarningRatio();
-						peRatio.setValue(vo100003.getPe());
+						peRatio.setValue((Double)result.get("pe"));
 						factorMap.put(PriceEarningRatio.FACTOR_NAME, peRatio);	
 					}
 				}
@@ -263,37 +272,41 @@ public class GAStockInfoLoader implements StockInfoLoader {
 	}
 
 	@Override
-	public void loadPC(HashMap<String, StockInfo> stockInfoMap, int date) {
+	public void loadPC(HashMap<String, StockInfo> stockInfoMap, String date) {
 		// TODO Auto-generated method stub
 		SqlSessionFactory sessionFactory = ConnUtil.getInstance(ConnUtil.GAZX_CONF);
 		SqlSession session = sessionFactory.openSession();
 		try {
-			VO100002 vo100002 = new VO100002();
+//			VO100002 vo100002 = new VO100002();
+//
+//			vo100002.setBeginDate(Integer.toString(date) + "01");
+//			vo100002.setEndDate(Integer.toString(date) + "31");
+//			HashMap<String, Object> resultSet = session.selectOne(
+//					"com.xubf.qt.quotation.inter.gazx.GangAoMapper.100002", vo100002);
+//
+//			SimpleDateFormat format = new SimpleDateFormat("yyyyMMDD");
+//
+//			String tradingDay = format.format((Date) resultSet.get("TRADINGDAY"));
+			
+			HashMap<String, String> inParam = new HashMap<String, String>();
+			
+			inParam.put("trading_date", date);
 
-			vo100002.setBeginDate(Integer.toString(date) + "01");
-			vo100002.setEndDate(Integer.toString(date) + "31");
-			HashMap<String, Object> resultSet = session.selectOne(
-					"com.xubf.qt.quotation.inter.gazx.GangAoMapper.100002", vo100002);
-
-			SimpleDateFormat format = new SimpleDateFormat("yyyyMMDD");
-
-			String tradingDay = format.format((Date) resultSet.get("TRADINGDAY"));
-
-			List<VO100003> vo100003List = session.selectList("com.xubf.qt.quotation.inter.gazx.GangAoMapper.100003",
-					tradingDay);
-			Iterator<VO100003> vo100003Iter = vo100003List.iterator();
-			while (vo100003Iter.hasNext()) {
-				VO100003 vo100003 = vo100003Iter.next();
-				if (stockInfoMap.containsKey(vo100003.getTradingCode())) {
-					StockInfo stockInfo = stockInfoMap.get(vo100003.getTradingCode());
+			List<HashMap<String, Object>> resultList = session.selectList("com.xubf.qt.quotation.inter.gazx.GangAoMapper.100003",
+					inParam);
+			Iterator<HashMap<String, Object>> resultIter = resultList.iterator();
+			while (resultIter.hasNext()) {
+				HashMap<String, Object> result = resultIter.next();
+				if (stockInfoMap.containsKey(result.get("tradingcode"))) {
+					StockInfo stockInfo = stockInfoMap.get(result.get("tradingcode"));
 					HashMap<String, AbstractFactor> factorMap = stockInfo.getFactorMap();
 					if (factorMap.containsKey(PriceCashFlowRatio.FACTOR_NAME)) {
 						PriceCashFlowRatio pcRatio = (PriceCashFlowRatio)factorMap.get(PriceCashFlowRatio.FACTOR_NAME);
-						pcRatio.setValue(vo100003.getPc());
+						pcRatio.setValue((Double)result.get("pc"));
 						
 					} else {
 						PriceCashFlowRatio pcRatio = new PriceCashFlowRatio();
-						pcRatio.setValue(vo100003.getPc());
+						pcRatio.setValue((Double)result.get("pc"));
 						factorMap.put(PriceCashFlowRatio.FACTOR_NAME, pcRatio);	
 					}
 				}
@@ -305,37 +318,41 @@ public class GAStockInfoLoader implements StockInfoLoader {
 	}
 
 	@Override
-	public void loadPS(HashMap<String, StockInfo> stockInfoMap, int date) {
+	public void loadPS(HashMap<String, StockInfo> stockInfoMap, String date) {
 		// TODO Auto-generated method stub
 		SqlSessionFactory sessionFactory = ConnUtil.getInstance(ConnUtil.GAZX_CONF);
 		SqlSession session = sessionFactory.openSession();
 		try {
-			VO100002 vo100002 = new VO100002();
+//			VO100002 vo100002 = new VO100002();
+//
+//			vo100002.setBeginDate(Integer.toString(date) + "01");
+//			vo100002.setEndDate(Integer.toString(date) + "31");
+//			HashMap<String, Object> resultSet = session.selectOne(
+//					"com.xubf.qt.quotation.inter.gazx.GangAoMapper.100002", vo100002);
+//
+//			SimpleDateFormat format = new SimpleDateFormat("yyyyMMDD");
+//
+//			String tradingDay = format.format((Date) resultSet.get("TRADINGDAY"));
+			
+			HashMap<String, String> inParam = new HashMap<String, String>();
+			
+			inParam.put("trading_date", date);
 
-			vo100002.setBeginDate(Integer.toString(date) + "01");
-			vo100002.setEndDate(Integer.toString(date) + "31");
-			HashMap<String, Object> resultSet = session.selectOne(
-					"com.xubf.qt.quotation.inter.gazx.GangAoMapper.100002", vo100002);
-
-			SimpleDateFormat format = new SimpleDateFormat("yyyyMMDD");
-
-			String tradingDay = format.format((Date) resultSet.get("TRADINGDAY"));
-
-			List<VO100003> vo100003List = session.selectList("com.xubf.qt.quotation.inter.gazx.GangAoMapper.100003",
-					tradingDay);
-			Iterator<VO100003> vo100003Iter = vo100003List.iterator();
-			while (vo100003Iter.hasNext()) {
-				VO100003 vo100003 = vo100003Iter.next();
-				if (stockInfoMap.containsKey(vo100003.getTradingCode())) {
-					StockInfo stockInfo = stockInfoMap.get(vo100003.getTradingCode());
+			List<HashMap<String, Object>> resultList = session.selectList("com.xubf.qt.quotation.inter.gazx.GangAoMapper.100003",
+					inParam);
+			Iterator<HashMap<String, Object>> resultIter = resultList.iterator();
+			while (resultIter.hasNext()) {
+				HashMap<String, Object> result = resultIter.next();
+				if (stockInfoMap.containsKey(result.get("tradingcode"))) {
+					StockInfo stockInfo = stockInfoMap.get(result.get("tradingcode"));
 					HashMap<String, AbstractFactor> factorMap = stockInfo.getFactorMap();
 					if (factorMap.containsKey(PriceSalseRatio.FACTOR_NAME)) {
 						PriceSalseRatio psRatio = (PriceSalseRatio)factorMap.get(PriceSalseRatio.FACTOR_NAME);
-						psRatio.setValue(vo100003.getPc());
+						psRatio.setValue((Double)result.get("pc"));
 						
 					} else {
 						PriceSalseRatio psRatio = new PriceSalseRatio();
-						psRatio.setValue(vo100003.getPc());
+						psRatio.setValue((Double)result.get("pc"));
 						factorMap.put(PriceSalseRatio.FACTOR_NAME, psRatio);	
 					}
 				}
@@ -346,7 +363,7 @@ public class GAStockInfoLoader implements StockInfoLoader {
 	}
 
 	@Override
-	public void loadROAVar(HashMap<String, StockInfo> stockInfoMap, int date) {
+	public void loadROAVar(HashMap<String, StockInfo> stockInfoMap, String date) {
 		// TODO Auto-generated method stub
 		SqlSessionFactory sessionFactory = ConnUtil.getInstance(ConnUtil.GAZX_CONF);
 		SqlSession session = sessionFactory.openSession();
